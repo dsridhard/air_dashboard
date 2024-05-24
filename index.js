@@ -1,24 +1,22 @@
-const express = require('express')
-const app = express()
-const port = process.env.PORT || 8000
-const connectToOracle = require('./dbConn');
+const express = require("express");
+const app = express();
+const port = process.env.PORT || 8000;
+const cors = require("cors");
+const bodyParser = require("body-parser");
 
-app.get('/', (req, res) => {
-  res.send('Hello World!!!')
-})
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(cors());
 
-app.get('/ir_refund', async (req, res) => {
-  try {
-    const connection = await connectToOracle();
-    const result = await connection.execute('SELECT * FROM IR_REFUND');
-    await connection.close();
+// Routes
+const refund = require("./refund");
+// Router End Here
 
-    res.json(result.rows);
-  } catch (err) {
-    console.error('Error fetching data:', err.message);
-    res.status(500).json({ error: 'Internal server error' });
-  }
+app.get("/", (req, res) => {
+  res.send("Hello World!!!");
 });
+
+app.use("/ir_refund", refund);
 app.listen(port, () => {
-  console.log(`AirDashboard_App listening on port ${port}`)
-}) 
+  console.log(`AirDashboard_App listening on port ${port}`);
+});
