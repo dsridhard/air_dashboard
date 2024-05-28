@@ -35,9 +35,9 @@ router.get("/", async (req, res) => {
       return rowData;
     });
 
-    res.json(rowsWithHeadings);
+     res.json(rowsWithHeadings);
 
-    res.json(result.rows);
+     //res.json(result.rows);
   } catch (err) {
     console.error("Error fetching data:", err.message);
     res.status(500).json({ error: "Internal server error" });
