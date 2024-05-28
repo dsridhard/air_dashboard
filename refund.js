@@ -1,11 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const connectToOracle = require("./dbConn");
-router.get("/:no", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
-    const num =  req.params.no
     const connection = await connectToOracle();
-    const result = await connection.execute(`SELECT  OID, REFUNDSEQID, STORE_ID, CREATION_TIME, STATUS, DELETED, LAST_MOD_TIME, TRANSACTIONID, REFUND_DATE, REFUND_AMOUNT, REFUND_STATUS, NOOFPASSENGERS, SETTLEMENT_ID, PAYMENT_GATEWAY_NAME, RECEIPT_NUMBER, ACTUAL_REFUND_DATE, DEFAULT_CREATION_TIME FROM IR_REFUND WHERE ROWNUM <= ${num}`);
+    const result = await connection.execute(
+      "SELECT  OID, REFUNDSEQID, STORE_ID, CREATION_TIME, STATUS, DELETED, LAST_MOD_TIME, TRANSACTIONID, REFUND_DATE, REFUND_AMOUNT, REFUND_STATUS, NOOFPASSENGERS, SETTLEMENT_ID, PAYMENT_GATEWAY_NAME, PAYMENT_GATEWAY_ID,SP_PNR,RECEIPT_NUMBER, ACTUAL_REFUND_DATE, DEFAULT_CREATION_TIME FROM IR_REFUND WHERE ROWNUM <= 50"
+    );
     await connection.close();
 
     const columnHeadings = [
@@ -23,12 +24,14 @@ router.get("/:no", async (req, res) => {
       "Number Of Passangers",
       "Settlement Id",
       "Payment Gateway Name",
+      "PAYMENT_GATEWAY_ID",
+      "SP_PNR",
       "Receipt Number",
       "Actual Refund Date",
-      "Default Creation Time"
+      "Default Creation Time",
     ];
 
-    const rowsWithHeadings = result.rows.map(row => {
+    const rowsWithHeadings = result.rows.map((row) => {
       const rowData = {};
       row.forEach((value, index) => {
         rowData[columnHeadings[index]] = value;

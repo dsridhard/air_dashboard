@@ -10,7 +10,7 @@ app.use(cors());
 
 // Routes
 const refund = require("./refund");
-const booking_recon_data  = require('./booking_recon-data')
+const booking_recon_data = require("./booking_recon-data");
 // Router End Here
 
 app.get("/", (req, res) => {
