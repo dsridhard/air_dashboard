@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+<<<<<<< HEAD
 const oracledb = require("oracledb"); // Ensure OracleDB is required
 const connectToOracle = require("./dbConn"); // Assuming this is your connection module
 
@@ -11,6 +12,14 @@ router.get("/:no", async (req, res) => {
     const query = `SELECT  OID, REFUNDSEQID, STORE_ID, CREATION_TIME, STATUS, DELETED, LAST_MOD_TIME, TRANSACTIONID, REFUND_DATE, REFUND_AMOUNT, REFUND_STATUS, NOOFPASSENGERS, SETTLEMENT_ID, PAYMENT_GATEWAY_NAME, RECEIPT_NUMBER, ACTUAL_REFUND_DATE, DEFAULT_CREATION_TIME FROM IR_REFUND WHERE ROWNUM <=: num`;
 
     const result = await connection.execute(query, [num], { outFormat: oracledb.OUT_FORMAT_OBJECT });
+=======
+const connectToOracle = require("./dbConn");
+router.get("/:no", async (req, res) => {
+  try {
+    const num =  req.params.no
+    const connection = await connectToOracle();
+    const result = await connection.execute(`SELECT  OID, REFUNDSEQID, STORE_ID, CREATION_TIME, STATUS, DELETED, LAST_MOD_TIME, TRANSACTIONID, REFUND_DATE, REFUND_AMOUNT, REFUND_STATUS, NOOFPASSENGERS, SETTLEMENT_ID, PAYMENT_GATEWAY_NAME, RECEIPT_NUMBER, ACTUAL_REFUND_DATE, DEFAULT_CREATION_TIME FROM IR_REFUND WHERE ROWNUM <= ${num}`);
+>>>>>>> refs/remotes/origin/main
     await connection.close();
 
     // Extract column names from metaData
