@@ -1,12 +1,23 @@
 const express = require("express");
 const router = express.Router();
+<<<<<<< HEAD
+const oracledb = require("oracledb"); // Ensure OracleDB is required
+const connectToOracle = require("./dbConn"); // Assuming this is your connection module
+
+router.get("/:no", async (req, res) => {
+  try {
+    const num = parseInt(req.params.no, 10); // Convert parameter to integer for security
+    const connection = await connectToOracle();
+    
+    const query = `SELECT  OID, REFUNDSEQID, STORE_ID, CREATION_TIME, STATUS, DELETED, LAST_MOD_TIME, TRANSACTIONID, REFUND_DATE, REFUND_AMOUNT, REFUND_STATUS, NOOFPASSENGERS, SETTLEMENT_ID, PAYMENT_GATEWAY_NAME, RECEIPT_NUMBER, ACTUAL_REFUND_DATE, DEFAULT_CREATION_TIME FROM IR_REFUND WHERE ROWNUM <=: num`;
+
+    const result = await connection.execute(query, [num], { outFormat: oracledb.OUT_FORMAT_OBJECT });
+=======
 const connectToOracle = require("./dbConn");
 router.get("/", async (req, res) => {
   try {
     const connection = await connectToOracle();
-    const result = await connection.execute(
-      "SELECT  OID, REFUNDSEQID, STORE_ID, CREATION_TIME, STATUS, DELETED, LAST_MOD_TIME, TRANSACTIONID, REFUND_DATE, REFUND_AMOUNT, REFUND_STATUS, NOOFPASSENGERS, SETTLEMENT_ID, PAYMENT_GATEWAY_NAME, PAYMENT_GATEWAY_ID,SP_PNR,RECEIPT_NUMBER, ACTUAL_REFUND_DATE, DEFAULT_CREATION_TIME FROM IR_REFUND WHERE ROWNUM <= 50"
-    );
+    const result = await connection.execute(`SELECT  OID, REFUNDSEQID, STORE_ID, CREATION_TIME, STATUS, DELETED, LAST_MOD_TIME, TRANSACTIONID, REFUND_DATE, REFUND_AMOUNT, REFUND_STATUS, NOOFPASSENGERS, SETTLEMENT_ID, PAYMENT_GATEWAY_NAME, RECEIPT_NUMBER, ACTUAL_REFUND_DATE, DEFAULT_CREATION_TIME FROM IR_REFUND WHERE ROWNUM <= ${num}`);
     await connection.close();
 
     const columnHeadings = [
@@ -24,27 +35,24 @@ router.get("/", async (req, res) => {
       "Number Of Passangers",
       "Settlement Id",
       "Payment Gateway Name",
-      "PAYMENT_GATEWAY_ID",
-      "SP_PNR",
       "Receipt Number",
       "Actual Refund Date",
-      "Default Creation Time",
+      "Default Creation Time"
     ];
 
-    const rowsWithHeadings = result.rows.map((row) => {
+    const rowsWithHeadings = result.rows.map(row => {
       const rowData = {};
-      row.forEach((value, index) => {
-        rowData[columnHeadings[index]] = value;
+      columnHeadings.forEach(heading => {
+        rowData[heading] = row[heading];
       });
       return rowData;
     });
 
     res.json(rowsWithHeadings);
-
-    res.json(result.rows);
   } catch (err) {
     console.error("Error fetching data:", err.message);
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 module.exports = router;
