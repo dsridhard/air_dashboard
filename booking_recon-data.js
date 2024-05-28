@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const oracledb = require("oracledb"); // Ensure OracleDB is required
-const connectToOracle = require("./dbConn"); // Assuming this is your connection module
+const oracledb = require("oracledb"); 
+const connectToOracle = require("./dbConn"); 
 
 router.get("/:no", async (req, res) => {
   try {
-    const num = parseInt(req.params.no, 10); // Convert parameter to integer for security
+    const num = parseInt(req.params.no, 10); 
     const connection = await connectToOracle();
     const query = `SELECT TRANSACTION_ID, AIRLINE_PNR, AIRLINE, BOOKING_STATUS, FARE_AMOUNTS, 
                           SEAT_AMOUNT, MEAL_AMOUNT, BAGGAGE_AMOUNT, IRCTC_CHARGES, CREATION_DATE, 
