@@ -11,6 +11,7 @@ app.use(cors());
 // Routes
 const refund = require("./refund");
 const booking_recon_data = require("./booking_recon-data");
+const airlinecode = require('./airlinesCode')
 // Router End Here
 
 app.get("/", (req, res) => {
@@ -19,6 +20,7 @@ app.get("/", (req, res) => {
 
 app.use("/ir_refund", refund);
 app.use("/book_recon", booking_recon_data);
+app.use("/airline", airlinecode);
 app.listen(port, () => {
-  console.log(`AirDashboard_App listening on port ${port}`);
+  console.log(`AirDashboard_App listening on port http:localhost:${port}`);
 });
