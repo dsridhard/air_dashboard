@@ -9,6 +9,7 @@ router.post("/:no", async (req, res) => {
     const airlineCode = req.body.airline;
     const bookFrom = req.body.bookfrom; 
     const bookTo = req.body.bookto;
+    const bookDate = req.body.bookdate
 
     const connection = await connectToOracle();
     const query = `
@@ -17,10 +18,11 @@ router.post("/:no", async (req, res) => {
              BOOKING_DATE, PAYMENT_GATEWAY_NAME, PAYMENT_GATEWAY_ID, TICKET_NO
       FROM booking_recon_data
       WHERE ROWNUM <= :num
-        AND AIRLINE = :airline
-        AND CREATION_DATE BETWEEN :bookFrom AND :bookTo`; 
+       OR AIRLINE = :airline
+       OR CREATION_DATE BETWEEN :bookFrom AND :bookTo
+       OR CREATION_DATE = :bookdate`; 
 
-    const result = await connection.execute(query, [num, airlineCode, bookFrom, bookTo], {
+    const result = await connection.execute(query, [num, airlineCode, bookFrom, bookTo, bookDate], {
       outFormat: oracledb.OUT_FORMAT_OBJECT,
     });
     await connection.close();
@@ -34,8 +36,10 @@ router.post("/:no", async (req, res) => {
       });
       return rowData;
     });
-
-    res.json(rowsWithHeadings);
+       
+  console.log(`resultset_no:${rowsWithHeadings.length}`)
+    
+   rowsWithHeadings.length == 0 ? res.json({message:"Record Not Found"}): res.json(rowsWithHeadings);
   } catch (err) {
     console.error("Error fetching data:", err.message);
     res.status(500).json({ error: "Internal server error" });
