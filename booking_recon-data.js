@@ -1,19 +1,26 @@
 const express = require("express");
 const router = express.Router();
-const oracledb = require("oracledb"); 
-const connectToOracle = require("./dbConn"); 
+const oracledb = require("oracledb");
+const connectToOracle = require("./dbConn");
 
-router.get("/:no", async (req, res) => {
+router.post("/:no", async (req, res) => {
   try {
-    const num = parseInt(req.params.no, 10); 
-    const connection = await connectToOracle();
-    const query = `SELECT TRANSACTION_ID, AIRLINE_PNR, AIRLINE, BOOKING_STATUS, FARE_AMOUNTS, 
-                          SEAT_AMOUNT, MEAL_AMOUNT, BAGGAGE_AMOUNT, IRCTC_CHARGES, CREATION_DATE, 
-                          BOOKING_DATE, PAYMENT_GATEWAY_NAME, PAYMENT_GATEWAY_ID, TICKET_NO 
-                   FROM booking_recon_data 
-                   WHERE ROWNUM <= :num`;
+    const num = req.params.no;
+    const airlineCode = req.body.airline;
+    const bookFrom = req.body.bookfrom; 
+    const bookTo = req.body.bookto;
 
-    const result = await connection.execute(query, [num], {
+    const connection = await connectToOracle();
+    const query = `
+      SELECT TRANSACTION_ID, AIRLINE_PNR, AIRLINE, BOOKING_STATUS, FARE_AMOUNTS,
+             SEAT_AMOUNT, MEAL_AMOUNT, BAGGAGE_AMOUNT, IRCTC_CHARGES, CREATION_DATE,
+             BOOKING_DATE, PAYMENT_GATEWAY_NAME, PAYMENT_GATEWAY_ID, TICKET_NO
+      FROM booking_recon_data
+      WHERE ROWNUM <= :num
+        AND AIRLINE = :airline
+        AND CREATION_DATE BETWEEN :bookFrom AND :bookTo`; 
+
+    const result = await connection.execute(query, [num, airlineCode, bookFrom, bookTo], {
       outFormat: oracledb.OUT_FORMAT_OBJECT,
     });
     await connection.close();
