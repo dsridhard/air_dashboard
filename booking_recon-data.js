@@ -8,27 +8,26 @@ router.post("/:no", async (req, res) => {
     const num = req.params.no;
     const bookFrom = req.body.bookfrom;
     const bookTo = req.body.bookto;
-    const airlineCode = req.body.airline
-    // const bookDate = req.body.bookdate;
-    // const paymentGateId = req.body.payGId;
-    // const transactionID = req.body.transactionid
-    // Check if either bookDate or both bookFrom and bookTo are provided
-    // if (!bookDate && (!bookFrom || !bookTo)) {
-    //   return res.status(400).json({
-    //     error:
-    //       "Invalid request. Provide either bookdate or both bookfrom and bookto.",
-    //   });
-    // }
+    const airlineCode = req.body.airline;
+    const bookDate = req.body.bookdate;
+    const transactionID = req.body.transactionid;
+    const airlinePNR = req.body.airpnr;
+    const PAYMENT_GATEWAY_ID = req.body.paymentGid;
+    console.log(airlinePNR);
 
     const connection = await connectToOracle();
     const query = `
-      SELECT TRANSACTION_ID, AIRLINE_PNR, AIRLINE, BOOKING_STATUS, FARE_AMOUNTS,
+      SELECT ID, TRANSACTION_ID, AIRLINE_PNR, AIRLINE, BOOKING_STATUS, FARE_AMOUNTS,
              SEAT_AMOUNT, MEAL_AMOUNT, BAGGAGE_AMOUNT, IRCTC_CHARGES, CREATION_DATE,
              BOOKING_DATE, PAYMENT_GATEWAY_NAME, PAYMENT_GATEWAY_ID, TICKET_NO
       FROM booking_recon_data
       WHERE ROWNUM <= :num
        AND BOOKING_DATE BETWEEN :bookfrom AND :bookto
-       OR  AIRLINE = : airline`;
+       OR  AIRLINE = : airline
+       OR  BOOKING_DATE = : bookingdate 
+       OR TRANSACTION_ID = : transactionid 
+       OR AIRLINE_PNR = : airpnr
+       OR PAYMENT_GATEWAY_ID = : paymentGid`;
 
     const result = await connection.execute(
       query,
@@ -37,11 +36,10 @@ router.post("/:no", async (req, res) => {
         bookFrom,
         bookTo,
         airlineCode,
-        // bookFrom,
-        // bookTo,
-        // bookDate,
-        //
-        // bookDate, paymentGateId , transactionID
+        bookDate,
+        transactionID,
+        airlinePNR,
+        PAYMENT_GATEWAY_ID,
       ],
       {
         outFormat: oracledb.OUT_FORMAT_OBJECT,
