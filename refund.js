@@ -3,16 +3,35 @@ const router = express.Router();
 const oracledb = require("oracledb");
 const connectToOracle = require("./dbConn");
 
-router.get("/:no", async (req, res) => {
+router.post("/:no", async (req, res) => {
   try {
     const num = req.params.no;
+    const receiptNo = req.body.receiptno;
+    const Transactionid = req.body.transactionid;
+    const RefundSeqId = req.body.refundseqid;
+    const PaymentGatewayName = req.body.paymentgatewayname;
+    console.log(RefundSeqId);
     const connection = await connectToOracle();
 
-    const query = `SELECT  OID, REFUNDSEQID, STORE_ID, CREATION_TIME, STATUS, DELETED, LAST_MOD_TIME, TRANSACTIONID, REFUND_DATE, REFUND_AMOUNT, REFUND_STATUS, NOOFPASSENGERS, SETTLEMENT_ID, PAYMENT_GATEWAY_NAME, RECEIPT_NUMBER, ACTUAL_REFUND_DATE, DEFAULT_CREATION_TIME FROM IR_REFUND WHERE ROWNUM <=: num`;
+    const query = `SELECT  
+           OID, REFUNDSEQID, STORE_ID, CREATION_TIME, 
+           STATUS, DELETED, LAST_MOD_TIME, TRANSACTIONID,
+           REFUND_DATE, REFUND_AMOUNT, REFUND_STATUS, NOOFPASSENGERS,
+           SETTLEMENT_ID, PAYMENT_GATEWAY_NAME, RECEIPT_NUMBER,
+           ACTUAL_REFUND_DATE, DEFAULT_CREATION_TIME FROM IR_REFUND
+           WHERE ROWNUM <=: num 
+           AND  RECEIPT_NUMBER = : receiptno 
+           OR TRANSACTIONID = : transactionid 
+           OR REFUNDSEQID = : refundseqid 
+           OR PAYMENT_GATEWAY_NAME = : paymentgatewayname`;
 
-    const result = await connection.execute(query, [num], {
-      outFormat: oracledb.OUT_FORMAT_OBJECT,
-    });
+    const result = await connection.execute(
+      query,
+      [num, receiptNo, Transactionid, RefundSeqId ,PaymentGatewayName],
+      {
+        outFormat: oracledb.OUT_FORMAT_OBJECT,
+      }
+    );
 
     await connection.close();
 
