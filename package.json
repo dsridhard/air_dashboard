@@ -1,13 +1,16 @@
 {
-  "name": "api",
+  "name": "air_dashboard",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "dashboard"
+  ],
+  "author": "sridhar",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.20.2",

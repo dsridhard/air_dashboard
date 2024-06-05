@@ -3,18 +3,15 @@ const router = express.Router();
 const connectToOracle = require("./dbConn");
 
 router.get("/", async (req, res) => {
+  let connection;
   try {
- 
     const connection = await connectToOracle();
     const result = await connection.execute(
       `SELECT AIRLINE_NAME , AIRLINE_CODE from AIRLINE_NAME_CODE_DETAILS`
     );
 
     await connection.close();
-    const columnHeadings = [
-      "AIRLINE_NAME",
-      "AIRLINE_CODE"
-    ];
+    const columnHeadings = ["AIRLINE_NAME", "AIRLINE_CODE"];
 
     const rowsWithHeadings = result.rows.map((row) => {
       const rowData = {};
@@ -28,6 +25,15 @@ router.get("/", async (req, res) => {
   } catch (err) {
     console.error("Error fetching data:", err.message);
     res.status(500).json({ error: "Internal server error" });
+  } finally {
+    if (connection) {
+      // the connection assignment worked, must release
+      try {
+        await connection.release();
+      } catch (e) {
+        console.error(e);
+      }
+    }
   }
 });
 

@@ -13,11 +13,11 @@ router.post("/:no", async (req, res) => {
     const transactionID = req.body.transactionid;
     const airlinePNR = req.body.airpnr;
     const PAYMENT_GATEWAY_ID = req.body.paymentGid;
-    console.log(airlinePNR);
+    // console.log(airlinePNR);
 
     const connection = await connectToOracle();
     const query = `
-      SELECT ID, TRANSACTION_ID, AIRLINE_PNR, AIRLINE, BOOKING_STATUS, FARE_AMOUNTS,
+      SELECT ID as id, TRANSACTION_ID, AIRLINE_PNR, AIRLINE, BOOKING_STATUS, FARE_AMOUNTS,
              SEAT_AMOUNT, MEAL_AMOUNT, BAGGAGE_AMOUNT, IRCTC_CHARGES, CREATION_DATE,
              BOOKING_DATE, PAYMENT_GATEWAY_NAME, PAYMENT_GATEWAY_ID, TICKET_NO
       FROM booking_recon_data
@@ -57,17 +57,11 @@ router.post("/:no", async (req, res) => {
       return rowData;
     });
 
-    console.log(`resultset_no:${rowsWithHeadings.length}`);
+    //  console.log(`resultset_no:${rowsWithHeadings.length}`);
 
     rowsWithHeadings.length === 0
       ? res.json({ message: "Record Not Found" })
-      : res.json([
-          {
-            message: "success",
-            status: 200,
-            data: rowsWithHeadings,
-          },
-        ]);
+      : res.json(rowsWithHeadings);
   } catch (err) {
     console.error("Error fetching data:", err.message);
     res.status(500).json({ error: "Internal server error" });

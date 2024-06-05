@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const oracledb = require("oracledb");
-const connectToOracle = require("./dbConn");
+const connectToOracle = require("./dbpool");
 const path = require("path");
 router.post("/:no", async (req, res) => {
   try {
